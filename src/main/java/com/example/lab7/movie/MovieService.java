@@ -1,4 +1,4 @@
-package com.example.lab7.book;
+package com.example.lab7.movie;
 
 import org.springframework.stereotype.Service;
 
@@ -6,45 +6,44 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class BookService {
-    private final BookRepository repository;
+public class MovieService {
+    private final MovieRepository repository;
 
-    public BookService(BookRepository repository) {
+    public MovieService(MovieRepository repository) {
         this.repository = repository;
     }
 
-    public BookDto create(BookDto dto) {
-        Book entity = dto.toEntity();
+    public MovieDto create(MovieDto dto) {
+        Movie entity = dto.toEntity();
         entity.setId(null);
         entity = repository.save(entity);
         return entity.toDto();
     }
 
-    public BookDto getById(Long id) {
+    public MovieDto getById(Long id) {
         return repository.findById(id)
-                .map(Book::toDto)
+                .map(Movie::toDto)
                 .orElse(null);
     }
 
-    public List<BookDto> getAll() {
+    public List<MovieDto> getAll() {
         return repository.findAll().stream()
-                .map(Book::toDto)
+                .map(Movie::toDto)
                 .toList();
     }
 
-    public BookDto update(Long id, BookDto dto) {
-        Book existing = repository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Book not found: " + id));
+    public MovieDto update(Long id, MovieDto dto) {
+        Movie existing = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Movie not found: " + id));
         existing.setTitle(dto.getTitle());
         existing.setAuthor(dto.getAuthor());
         existing.setYear(dto.getYear());
-        existing.setIsbn(dto.getIsbn());
         return repository.save(existing).toDto();
     }
 
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new NoSuchElementException("Book not found: " + id);
+            throw new NoSuchElementException("Movie not found: " + id);
         }
         repository.deleteById(id);
     }
