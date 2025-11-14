@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +15,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +27,11 @@ public class Movie {
     private Integer year;
 
     public MovieDto toDto() {
-        return MovieDto.builder()
-                .id(this.id)
-                .title(this.title)
-                .author(this.author)
-                .year(this.year)
-                .build();
+        MovieDto dto = new MovieDto();
+        dto.setId(this.id);
+        dto.setTitle(this.title);
+        dto.setAuthor(this.author);
+        dto.setYear(this.year);
+        return dto;
     }
 }

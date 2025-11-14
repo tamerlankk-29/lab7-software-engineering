@@ -3,7 +3,7 @@ package com.example.lab7.movie;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.ArrayList;
 
 @Service
 public class MovieService {
@@ -21,30 +21,36 @@ public class MovieService {
     }
 
     public MovieDto getById(Long id) {
-        return repository.findById(id)
-                .map(Movie::toDto)
-                .orElse(null);
+        Movie entity = repository.findById(id).orElse(null);
+        if (entity == null) return null;
+        return entity.toDto();
     }
 
     public List<MovieDto> getAll() {
-        return repository.findAll().stream()
-                .map(Movie::toDto)
-                .toList();
+        List<Movie> entities = repository.findAll();
+        List<MovieDto> result = new ArrayList<>();
+        for (Movie m : entities) {
+            result.add(m.toDto());
+        }
+        return result;
     }
 
     public MovieDto update(Long id, MovieDto dto) {
-        Movie existing = repository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Movie not found: " + id));
+        Movie existing = repository.findById(id).orElse(null);
+        if (existing == null) {
+            return null;
+        }
         existing.setTitle(dto.getTitle());
         existing.setAuthor(dto.getAuthor());
         existing.setYear(dto.getYear());
         return repository.save(existing).toDto();
     }
 
-    public void delete(Long id) {
+    public boolean delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new NoSuchElementException("Movie not found: " + id);
+            return false;
         }
         repository.deleteById(id);
+        return true;
     }
 }
