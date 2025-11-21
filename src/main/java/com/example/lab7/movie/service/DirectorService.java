@@ -30,4 +30,21 @@ public class DirectorService {
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public DirectorDto getById(Long id) {
+        return repository.findById(id).map(mapper::toDto).orElse(null);
+    }
+
+    public DirectorDto update(Long id, DirectorDto dto) {
+        Director existing = repository.findById(id).orElse(null);
+        if (existing == null) return null;
+        mapper.updateEntity(dto, existing);
+        return mapper.toDto(repository.save(existing));
+    }
+
+    public boolean delete(Long id) {
+        if (!repository.existsById(id)) return false;
+        repository.deleteById(id);
+        return true;
+    }
 }

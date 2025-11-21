@@ -20,9 +20,8 @@ public class TagService {
     }
 
     public TagDto create(TagDto dto) {
-        Tag entity = new Tag();
+        Tag entity = mapper.toEntity(dto);
         entity.setId(null);
-        entity.setName(dto.getName());
         return mapper.toDto(repository.save(entity));
     }
 
@@ -30,5 +29,22 @@ public class TagService {
         return repository.findAll().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public TagDto getById(Long id) {
+        return repository.findById(id).map(mapper::toDto).orElse(null);
+    }
+
+    public TagDto update(Long id, TagDto dto) {
+        Tag existing = repository.findById(id).orElse(null);
+        if (existing == null) return null;
+        mapper.updateEntity(dto, existing);
+        return mapper.toDto(repository.save(existing));
+    }
+
+    public boolean delete(Long id) {
+        if (!repository.existsById(id)) return false;
+        repository.deleteById(id);
+        return true;
     }
 }

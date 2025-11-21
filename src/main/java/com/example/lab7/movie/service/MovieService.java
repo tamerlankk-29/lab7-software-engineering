@@ -36,6 +36,19 @@ public class MovieService {
     }
 
     public MovieReadDto create(MovieWriteDto dto) {
+        if (dto.getDirectorId() != null && !directorRepository.existsById(dto.getDirectorId())) {
+            throw new IllegalArgumentException("Director not found: " + dto.getDirectorId());
+        }
+        if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+            var ids = dto.getTagIds();
+            var found = tagRepository.findAllById(ids);
+            if (found.size() != ids.size()) {
+                var foundIds = found.stream().map(t -> t.getId()).collect(java.util.stream.Collectors.toSet());
+                var missing = new java.util.HashSet<>(ids);
+                missing.removeAll(foundIds);
+                throw new IllegalArgumentException("Tags not found: " + missing);
+            }
+        }
         Movie entity = movieWriteMapper.toEntity(dto, directorRepository, tagRepository);
         entity.setId(null);
         entity = repository.save(entity);
@@ -60,6 +73,19 @@ public class MovieService {
         Movie existing = repository.findById(id).orElse(null);
         if (existing == null) {
             return null;
+        }
+        if (dto.getDirectorId() != null && !directorRepository.existsById(dto.getDirectorId())) {
+            throw new IllegalArgumentException("Director not found: " + dto.getDirectorId());
+        }
+        if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+            var ids = dto.getTagIds();
+            var found = tagRepository.findAllById(ids);
+            if (found.size() != ids.size()) {
+                var foundIds = found.stream().map(t -> t.getId()).collect(java.util.stream.Collectors.toSet());
+                var missing = new java.util.HashSet<>(ids);
+                missing.removeAll(foundIds);
+                throw new IllegalArgumentException("Tags not found: " + missing);
+            }
         }
         movieWriteMapper.updateEntity(dto, existing, directorRepository, tagRepository);
         return movieMapper.toReadDto(repository.save(existing));

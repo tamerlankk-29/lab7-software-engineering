@@ -5,8 +5,10 @@ import com.example.lab7.movie.dto.MovieWriteDto;
 import com.example.lab7.movie.service.MovieService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -19,8 +21,10 @@ public class MovieController {
     }
 
     @PostMapping
-    public MovieReadDto create(@RequestBody MovieWriteDto dto) {
-        return service.create(dto);
+    public ResponseEntity<MovieReadDto> create(@RequestBody MovieWriteDto dto, UriComponentsBuilder uriBuilder) {
+        MovieReadDto created = service.create(dto);
+        URI location = uriBuilder.path("/api/movies/{id}").buildAndExpand(created.getId()).toUri();
+        return ResponseEntity.created(location).body(created);
     }
 
     @GetMapping("/{id}")
